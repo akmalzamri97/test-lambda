@@ -11,15 +11,11 @@ const lambdaCallApi = async (event) => {
 
   const { params } = event
 
-  const customAxios = await clientHttp(URL, null)
+  const customAxios = clientHttp( { baseURL: URL, headers: {}, config: { signService: 'lambda' } } )
 
   console.log('customAxios', customAxios)
 
   let result = await customAxios.get(`/customers/${params}`)
-    .then(res => 
-    {
-      return res
-    }); 
 
   console.log("RESULT result", result)
   console.log("RESULT", result.data)

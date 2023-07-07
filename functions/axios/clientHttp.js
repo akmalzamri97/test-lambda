@@ -1,70 +1,47 @@
-const axios = require('axios');
-const { signatureV4 } = require('./signatureV4')
+const axios = require("axios");
+const { signatureV4 } = require("./signatureV4");
 
-async function clientHttp (baseURL, headers) {
+function clientHttp({ baseURL, headers, config: { signService } }) {
+
+  console.log("clientHttp", baseURL, headers )
+  console.log("clientHttp signService", signService)
+
   let customAxios = axios.create({
-    baseURL: baseURL || 'https://api.example.com', // API base URL
+    baseURL: baseURL || "https://api.example.com", // API base URL
     headers: headers || {
-      'Content-Type': 'application/json', // Set default content type
-    }
+      "Content-Type": "application/json", // Set default content type
+    },
   });
 
   // INTERCEPTOR FOR REQUEST
-  customAxios.interceptors.request.use(
-    async function (config) {
-      const { sign } = config
 
-      customAxios.interceptors.request.clear()
+  customAxios.interceptors.request.use((req) => {
+    console.log("Request Interceptor 1", req);
 
-      console.log("SIGN", sign)
-
-      if (sign != null) {
-        const signatureV4Result = await signatureV4({ region: process.env.REGION, service: sign })
-        customAxios.interceptors.request.use(signatureV4Result)
-      }
-
-      customAxios.interceptors.request.use((req) => {
-        console.log('Request Interceptor', {
-          baseUrl: req.baseURL,
-          data: req.data,
-          headers: req.headers,
-          method: req.method,
-          params: req.params,
-          url: req.url
-        })
-  
-        return req
-      })
-
-      return config;
-    },
-    function (error) {
-      console.error('Request Interceptor Error:', error);
-      return Promise.reject(error);
+    if(signService != null){
+      const signatureV4Result = signatureV4({ region: process.env.REGION, service: signService }, req, customAxios)
+      return signatureV4Result;
     }
-  );
+    return req;
+  });
 
+  console.log("request interceptor: DONE")
+
+  // INTERCEPTOR FOR REQUEST
   customAxios.interceptors.response.use(
     function (response) {
-      console.log('Response Interceptor:', response);
+      console.log("Response Interceptor:", response);
       return response;
     },
     function (error) {
-      console.error('Response Interceptor Error:', error);
+      console.error("Response Interceptor Error:", error);
       return Promise.reject(error);
     }
   );
 
-  // Add custom methods to the customAxios instance
-  Object.assign(customAxios, {
-    get: customAxios.get || axios.get,
-    post: customAxios.post || axios.post
-    // Add other HTTP methods as needed
-  });
-
-  console.log("clientHttp", customAxios)
+  console.log("clientHttp", customAxios);
 
   return customAxios;
 }
 
-module.exports = { clientHttp }
+module.exports = { clientHttp };
