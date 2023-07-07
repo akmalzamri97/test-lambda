@@ -27,18 +27,6 @@ function clientHttp({ baseURL, headers, config: { signService } }) {
 
   console.log("request interceptor: DONE")
 
-  // INTERCEPTOR FOR REQUEST
-  customAxios.interceptors.response.use(
-    function (response) {
-      console.log("Response Interceptor:", response);
-      return response;
-    },
-    function (error) {
-      console.error("Response Interceptor Error:", error);
-      return Promise.reject(error);
-    }
-  );
-
   console.log("clientHttp", customAxios);
 
   return customAxios;

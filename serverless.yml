@@ -11,16 +11,14 @@ provider:
   stage: dev
   region: ap-southeast-1
 
-  # iam:
-  #   role:
-  #     statements:
-  #       # S3
-  #       - Effect: 'Allow'
-  #         Action:
-  #           - s3:GetObject
-  #           - s3:DeleteObject
-  #           - s3:PutObject
-  #         Resource: 'arn:aws:s3:::${self:provider.environment.TEST_BUCKET}/*'
+  iam:
+      role:
+        statements:
+          - Effect: Allow
+            Resource: '*'
+            Action:
+              - lambda:InvokeFunctionUrl
+            # Resource: arn:aws:lambda:ap-southeast-1:193980408680:function:moli-customer-dev-customer
 
   environment:
     REGION: ${self:provider.region}
@@ -32,14 +30,6 @@ functions:
     handler: index.lambdaCallApi
     timeout: 900
     memorySize: 1028
-    # events:
-    #   - s3:
-    #       bucket: ${self:provider.environment.TEST_BUCKET}
-    #       event: s3:ObjectCreated:*
-    #       rules:
-    #         - prefix: UPLOAD/
-    #         - suffix: .csv
-    #       existing: true
 
 plugins:
  - serverless-offline
