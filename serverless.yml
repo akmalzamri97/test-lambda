@@ -1,0 +1,45 @@
+service: test-lambda
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: nodejs14.x
+
+  deploymentBucket: 
+    name: test-lambda-function-1
+
+  stage: dev
+  region: ap-southeast-1
+
+  # iam:
+  #   role:
+  #     statements:
+  #       # S3
+  #       - Effect: 'Allow'
+  #         Action:
+  #           - s3:GetObject
+  #           - s3:DeleteObject
+  #           - s3:PutObject
+  #         Resource: 'arn:aws:s3:::${self:provider.environment.TEST_BUCKET}/*'
+
+  environment:
+    REGION: ${self:provider.region}
+    STAGE: ${self:provider.stage}
+    # TEST_BUCKET: akmal-test-1
+
+functions:
+  lambdaCallApi:
+    handler: index.lambdaCallApi
+    timeout: 900
+    memorySize: 1028
+    # events:
+    #   - s3:
+    #       bucket: ${self:provider.environment.TEST_BUCKET}
+    #       event: s3:ObjectCreated:*
+    #       rules:
+    #         - prefix: UPLOAD/
+    #         - suffix: .csv
+    #       existing: true
+
+plugins:
+ - serverless-offline
