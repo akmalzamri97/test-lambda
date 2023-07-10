@@ -2,11 +2,9 @@ const axios = require('axios');
 const { sign } = require('aws4');
 const _ = require('lodash');
 
-const signatureV4 = async (options, config, customAxios) => {
+const signatureV4 = async (options, config) => {
 
-  const url = customAxios.getUri()
-
-  console.log("signatureV4 URL", url, config)
+  const url = axios.getUri(config)
 
   const { host, pathname, search } = new URL(url)
   const { data, headers, method } = config
@@ -47,7 +45,6 @@ const signatureV4 = async (options, config, customAxios) => {
 
   config.headers = new axios.AxiosHeaders(signingOptions.headers)
 
-  console.log("signatureV4 config", config)
 
   return config
 }
